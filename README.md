@@ -1,0 +1,4 @@
+WidgetFix
+=========
+
+Corona widget fixes
