@@ -31,6 +31,6 @@ Included fixes:
 
 - fixed table view bug when deleting multiple rows
 
-- fixed table view deleteRow bug that says table view is scrolling when it's not and doesn't allow insert
+- fixed table view deleteRow bug that says table view is scrolling when it's not and doesn't allow deletion
 
 - all scrollTo methods for scrollView and tableView return the transition handle so it can be canceled if needed
