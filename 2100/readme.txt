@@ -21,8 +21,6 @@ Included fixes:
 
 - scroll view will not jump back to starting position if scrolling in opposite direction before bounce back has completed (vertical and horizontal)
 
-- eliminated occasional error when removing objects from scroll view
-
 - exposed scrollView:updateScrollAreaSize() for making sure the scroll works correctly when moving objects inside the scroll view
 
 - fixed some issues when using multiple scroll views at the same time

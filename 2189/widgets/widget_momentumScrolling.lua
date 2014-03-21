@@ -58,12 +58,6 @@ local function setLimits( self, view )
 	if view._scrollHeight then
 		local upperLimit = ( -view._scrollHeight + view._height ) - view._bottomPadding
 		
-		-- the lower limit calculation is not necessary. We shift the view up with half its height, so the only thing we need to calculate
-		-- is the upper limit.
-		
-		--if isGraphicsV1 then
-		--	upperLimit = upperLimit - view._height * 0.5
-		--end
 		view.upperLimit = upperLimit
 	end
 	
@@ -115,7 +109,7 @@ local function handleSnapBackVertical( self, view, snapBack )
 					
 					-- Put the view back to the top
 					view._snapping = true
-					view._tween = transition.to( view, { time = bounceTime, y = view.bottomLimit, transition = easing.outQuad, onComplete = function() view._snapping = false; end } )						
+					view._vTween = transition.to( view, { time = bounceTime, y = view.bottomLimit, transition = easing.outQuad, onComplete = function() view._snapping = false; end } )
 				end
 			end
 			
@@ -134,7 +128,7 @@ local function handleSnapBackVertical( self, view, snapBack )
 					
 					-- Put the view back to the bottom
 					view._snapping = true
-					view._tween = transition.to( view, { time = bounceTime, y = view.upperLimit, transition = easing.outQuad, onComplete = function() view._snapping = false; end } )
+					view._vTween = transition.to( view, { time = bounceTime, y = view.upperLimit, transition = easing.outQuad, onComplete = function() view._snapping = false; end } )
 				end
 			end
 		end
@@ -166,7 +160,7 @@ local function handleSnapBackHorizontal( self, view, snapBack )
 			if "boolean" == type( snapBack ) then
 				if snapBack == true then
 					view._snapping = true
-					view._tween = transition.to( view, { time = bounceTime, x = view.leftLimit, transition = easing.outQuad, onComplete = function() view._snapping = false; end } )
+					view._hTween = transition.to( view, { time = bounceTime, x = view.leftLimit, transition = easing.outQuad, onComplete = function() view._snapping = false; end } )
 					
 				end
 			end
@@ -180,7 +174,7 @@ local function handleSnapBackHorizontal( self, view, snapBack )
 			if "boolean" == type( snapBack ) then
 				if snapBack == true then
 					view._snapping = true
-					view._tween = transition.to( view, { time = bounceTime, x = view.rightLimit, transition = easing.outQuad, onComplete = function() view._snapping = false; end } )
+					view._hTween = transition.to( view, { time = bounceTime, x = view.rightLimit, transition = easing.outQuad, onComplete = function() view._snapping = false; end } )
 				end
 			end
 		end
@@ -224,13 +218,15 @@ function M._touch( view, event )
 		setLimits( M, view )
 		
 		-- Cancel any active tween on the view
-		if view._tween then
-			--if not view._snapping then  --cancel in any case, new tween will be created if not moved inside the bounds
-				transition.cancel( view._tween )
-				view._tween = nil
-			--else
-			--	transition.pause( view._tween )
-			--end
+		if view._hTween then
+                        transition.cancel( view._hTween )
+                        view._hTween = nil
+                        view._snapping = false
+		end
+                if view._vTween then
+                        transition.cancel( view._vTween )
+                        view._vTween = nil
+                        view._snapping = false
 		end				
 		
 		-- Set focus
@@ -446,12 +442,11 @@ function M._touch( view, event )
 			display.getCurrentStage():setFocus( nil )
 			view._isFocus = nil
 		
-		-- if we have a snap transition that's paused, resume it
-                -- we don't any more
-		--if view._tween and true == view._snapping then
-		--	transition.resume( view._tween )
-		--end	
-			
+                        --check if snap back is needed
+                        if not view._moveDirection then
+                            handleSnapBackHorizontal(M, view, true)
+                            handleSnapBackVertical(M, view, true)
+                        end
 		end
 	end
 end
@@ -751,7 +746,7 @@ function M.createScrollBar( view, options )
 	M.scrollBar._viewHeight = viewHeight
 	M.scrollBar._viewContentHeight = viewContentHeight
 	M.scrollBar.alpha = 0 -- The scrollBar is invisible initally
-	M.scrollBar._tween = nil
+	M.scrollBar._sbTween = nil
 	
 	-- function to recalculate the scrollbar params, based on content height change
 	function M.scrollBar:repositionY()
@@ -805,7 +800,7 @@ function M.createScrollBar( view, options )
 	function M.scrollBar:show()
 		-- Cancel any previous transition
 		if self._sbTween then
-			transition.cancel( self._tween ) 
+			transition.cancel( self._sbTween ) 
 			self._sbTween = nil
 		end
 		

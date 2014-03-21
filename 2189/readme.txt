@@ -21,8 +21,6 @@ Included fixes:
 
 - scroll view and table view will not jump back to starting position if scrolling in opposite direction before bounce back has completed (vertical and horizontal)
 
-- eliminated occasional error when removing objects from scroll view
-
 - exposed scrollView:updateScrollAreaSize() for making sure the scroll works correctly when moving objects inside the scroll view
 
 - fixed some issues when using multiple scroll views or table views at the same time
@@ -31,6 +29,6 @@ Included fixes:
 
 - fixed table view bug when deleting multiple rows
 
-- fixed table view deleteRow bug that says table view is scrolling when it's not and doesn't allow deletion
+- fixed table view deleteRow bug that says table view is scrolling when it's not and doesn't allow insert
 
 - all scrollTo methods for scrollView and tableView return the transition handle so it can be canceled if needed
